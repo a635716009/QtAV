@@ -1,12 +1,14 @@
-exit 0
-cd tools
-git clone https://github.com/andreyvit/create-dmg.git
-
-./deploy_osx.sh $TRAVIS_BUILD_DIR/$QTAV_OUT
-
-
 PKG=$TRAVIS_BUILD_DIR/${QTAV_OUT}-QMLPlayer.dmg
-mv QtAV-QMLPlayer.dmg $PKG
+
+cd $QTAV_OUT
+cp -af lib_osx_x86_64_llvm/*.framework bin/Player.app/Contents/Frameworks
+mkdir -p bin/Player.app/Contents/Resources/qml/QtAV
+cp -avf lib_osx_x86_64_llvm/*.dylib bin/Player.app/Contents/Resources/qml/QtAV
+cp -avf $TRAVIS_BUILD_DIR/qml/{plugins.qmltypes,Video.qml,qmldir} bin/Player.app/Contents/Resources/qml/QtAV
+cp -avf $TRAVIS_BUILD_DIR/tools/sdk_osx.sh bin/Player.app/
+macdeployqt bin/Player.app -dmg
+hdiutil convert -format UDBZ bin/Player.dmg -o $PKG
+cd -
 
 wget http://sourceforge.net/projects/sshpass/files/sshpass/1.05/sshpass-1.05.tar.gz/download -O sshpass.tar.gz
 tar zxf sshpass.tar.gz
